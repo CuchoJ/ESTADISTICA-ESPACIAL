@@ -1,58 +1,112 @@
-# Instalar librerías si no las tienes
-install.packages("boot")      # para bootstrap
-install.packages("ggplot2")   # para gráficos
-install.packages("dplyr")     # para manipulación de datos
+# =========================================================
+# BOOTSTRAP EN R: ESTADÍSTICOS COMPLETOS
+# =========================================================
+# Incluye: media, mediana, varianza y desviación estándar
+# con verificación de normalidad, intervalos de confianza
+# y visualización gráfica.
+# =========================================================
 
-# Cargar librerías
-library(boot)
-library(ggplot2)
-library(dplyr)
+# ----------------------------------
+# 1. Instalación y carga de librerías
+# ----------------------------------
+# Descomentar si no tienes instaladas:
+# install.packages("boot")
+# install.packages("ggplot2")
+# install.packages("gridExtra")
 
-# Dataset de ejemplo
-data(mtcars)
+library(boot)       # Para bootstrap
+library(ggplot2)    # Para gráficos
+library(gridExtra)  # Para combinar gráficos
 
-# ================================
-# 1. Función estadística: media de mpg
-# ================================
-media_mpg <- function(data, indices) {
-  muestra <- data[indices, ]       # remuestreo con reemplazo
-  return(mean(muestra$mpg))        # calcular la media de mpg
+# ----------------------------------
+# 2. Generamos datos normales
+# ----------------------------------
+set.seed(123)
+n <- 100
+muestra <- rnorm(n, mean = 100, sd = 15)  # Normal(100, 15^2)
+
+# ----------------------------------
+# 3. Comprobamos normalidad
+# ----------------------------------
+cat("===== Test de Normalidad =====\n")
+print(shapiro.test(muestra))   # Test de Shapiro-Wilk
+qqnorm(muestra, main = "QQ-Plot para verificar normalidad")
+qqline(muestra, col = "red")
+
+# ----------------------------------
+# 4. Definimos funciones para estadísticos
+# ----------------------------------
+f_media <- function(data, i) mean(data[i])
+f_mediana <- function(data, i) median(data[i])
+f_var <- function(data, i) var(data[i])
+f_sd <- function(data, i) sd(data[i])
+
+# ----------------------------------
+# 5. Bootstrap para cada estadístico
+# ----------------------------------
+R <- 2000  # número de réplicas bootstrap
+
+boot_media   <- boot(muestra, f_media, R)
+boot_mediana <- boot(muestra, f_mediana, R)
+boot_var     <- boot(muestra, f_var, R)
+boot_sd      <- boot(muestra, f_sd, R)
+
+# ----------------------------------
+# 6. Intervalos de confianza
+# ----------------------------------
+cat("===== Intervalos de confianza (95%) =====\n")
+cat("Media:\n");   print(boot.ci(boot_media, type = c("perc", "bca")))
+cat("Mediana:\n"); print(boot.ci(boot_mediana, type = c("perc", "bca")))
+cat("Varianza:\n");print(boot.ci(boot_var, type = c("perc", "bca")))
+cat("Desv. Estándar:\n"); print(boot.ci(boot_sd, type = c("perc", "bca")))
+
+# ----------------------------------
+# 7. Visualización
+# ----------------------------------
+# Creamos dataframes para graficar
+df_media   <- data.frame(valor = boot_media$t,   estadistico = "Media")
+df_mediana <- data.frame(valor = boot_mediana$t, estadistico = "Mediana")
+df_var     <- data.frame(valor = boot_var$t,     estadistico = "Varianza")
+df_sd      <- data.frame(valor = boot_sd$t,      estadistico = "Desv. Estándar")
+
+# Histograma + densidad para cada estadístico
+plot_boot <- function(df, original, titulo) {
+  ic <- boot.ci(boot(data = muestra, statistic = function(d,i) df$valor, R=2000), type="perc")$percent[4:5]
+  
+  ggplot(df, aes(x = valor)) +
+    geom_histogram(bins = 30, fill = "skyblue", color = "black", alpha = 0.7) +
+    geom_vline(xintercept = original, color = "red", linetype = "dashed", size = 1) +
+    labs(title = titulo, x = "Valores bootstrap", y = "Frecuencia") +
+    theme_minimal()
 }
 
-# ================================
-# 2. Aplicar bootstrap
-# ================================
-set.seed(123)   # Semilla para reproducibilidad
-resultado <- boot(data = mtcars, statistic = media_mpg, R = 2000)
+# Gráficos individuales
+p1 <- ggplot(df_media, aes(x = valor)) +
+  geom_density(fill="lightblue", alpha=0.6) +
+  geom_vline(xintercept = mean(muestra), color="red", linetype="dashed") +
+  labs(title="Bootstrap Media", x="Media", y="Densidad") +
+  theme_minimal()
 
-# Mostrar resumen
-print(resultado)
+p2 <- ggplot(df_mediana, aes(x = valor)) +
+  geom_density(fill="lightgreen", alpha=0.6) +
+  geom_vline(xintercept = median(muestra), color="red", linetype="dashed") +
+  labs(title="Bootstrap Mediana", x="Mediana", y="Densidad") +
+  theme_minimal()
 
-# Intervalo de confianza bootstrap al 95%
-ic <- boot.ci(resultado, type = c("perc", "bca"))
-print(ic)
+p3 <- ggplot(df_var, aes(x = valor)) +
+  geom_density(fill="orange", alpha=0.6) +
+  geom_vline(xintercept = var(muestra), color="red", linetype="dashed") +
+  labs(title="Bootstrap Varianza", x="Varianza", y="Densidad") +
+  theme_minimal()
 
-# ================================
-# 3. Gráfico de la distribución bootstrap
-# ================================
-# Guardar los valores bootstrap
-bootstrap_vals <- resultado$t
+p4 <- ggplot(df_sd, aes(x = valor)) +
+  geom_density(fill="purple", alpha=0.6) +
+  geom_vline(xintercept = sd(muestra), color="red", linetype="dashed") +
+  labs(title="Bootstrap Desv. Estándar", x="SD", y="Densidad") +
+  theme_minimal()
 
-# Crear un data frame para graficar
-df_boot <- data.frame(media_bootstrap = bootstrap_vals)
+# Mostrar en una cuadrícula
+grid.arrange(p1, p2, p3, p4, ncol=2)
 
-# Gráfico con ggplot2
-ggplot(df_boot, aes(x = media_bootstrap)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "black", alpha = 0.7) +
-  geom_vline(aes(xintercept = mean(mtcars$mpg)),
-             color = "red", linetype = "dashed", size = 1.2) +
-  geom_vline(aes(xintercept = ic$perc[4]),
-             color = "darkgreen", linetype = "dashed", size = 1) +
-  geom_vline(aes(xintercept = ic$perc[5]),
-             color = "darkgreen", linetype = "dashed", size = 1) +
-  labs(title = "Distribución Bootstrap de la Media de mpg",
-       subtitle = "Líneas rojas = media original | Líneas verdes = IC al 95%",
-       x = "Media bootstrap de mpg",
-       y = "Frecuencia") +
-  theme_minimal(base_size = 14)
+
 
