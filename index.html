@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Visor de PDFs — GitHub Pages</title>
+  <meta name="description" content="Visor sencillo de PDFs para colocar en un repositorio y usar con GitHub Pages" />
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#38bdf8}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{background:linear-gradient(180deg,#071024 0%,#071833 100%);color:#e6eef8}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;gap:16px;align-items:center}
+    h1{margin:0;font-size:20px}
+    .layout{display:grid;grid-template-columns:320px 1fr;gap:18px;margin-top:18px}
+    .panel{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,.6)}
+    .list{height:64vh;overflow:auto}
+    .file{padding:10px;border-radius:8px;margin-bottom:8px;cursor:pointer;background:transparent;border:1px solid transparent}
+    .file:hover{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.03)}
+    .file.active{outline:2px solid rgba(56,189,248,0.12);background:linear-gradient(90deg,rgba(56,189,248,0.03),transparent)}
+    .controls{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+    button{background:transparent;color:var(--accent);border:1px solid rgba(56,189,248,0.18);padding:6px 8px;border-radius:8px;cursor:pointer}
+    button:active{transform:translateY(1px)}
+    .viewer{height:72vh;display:flex;flex-direction:column}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px}
+    .canvas-wrap{flex:1;overflow:auto;background:#081022;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center}
+    canvas{box-shadow:0 8px 30px rgba(2,6,23,0.6);max-width:100%;height:auto}
+    .search{width:100%;padding:8px;margin-bottom:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
+    .note{font-size:13px;color:var(--muted);margin-top:10px}
+    .fallback-link{color:var(--accent);text-decoration:underline}
+    @media (max-width:880px){.layout{grid-template-columns:1fr} .list{height:24vh}.viewer{height:56vh}}
+  </style>
+  <!--
+    INSTRUCCIONES (LEE):
+    1) Coloca tus PDFs dentro de la carpeta `pdfs/` en tu repositorio (junto a este archivo) o usa rutas relativas.
+    2) Edita la variable `pdfList` más abajo para añadir/ordenar los nombres de los PDFs.
+    3) Sube al repo y activa GitHub Pages (branch main / docs/ o root según prefieras).
+    4) Abre la página publicada para ver y navegar los PDFs.
+
+    Nota: GitHub Pages sirve archivos estáticos. El visor usa pdf.js (CDN). Si prefieres no depender del CDN
+    puedes descargar pdf.js y referenciarlo localmente (sustituye las URLs de worker y librería).
+  -->
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 24 24'><rect rx='5' width='24' height='24' fill='%2338bdf8'/><text x='50%' y='54%' font-size='12' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>PDF</text></svg>" alt="logo" style="border-radius:8px;"/>
+      <div>
+        <h1>Visor de PDFs (para GitHub Pages)</h1>
+        <div style="color:var(--muted);font-size:13px">Clic en un archivo a la izquierda para cargarlo aquí.</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel">
+        <div class="controls">
+          <input id="search" class="search" placeholder="Buscar archivos..." />
+        </div>
+        <div class="list" id="fileList" aria-live="polite"></div>
+        <div class="note">Coloca tus PDFs en <code>pdfs/</code> y añade sus nombres en la variable <code>pdfList</code> dentro del código.</div>
+      </aside>
+
+      <main class="panel viewer">
+        <div class="toolbar">
+          <div>
+            <button id="prev">◀ Página anterior</button>
+            <button id="next">Página siguiente</button>
+            <span id="pageInfo" style="margin-left:10px;color:var(--muted)"></span>
+          </div>
+          <div>
+            <button id="zoomOut">-</button>
+            <button id="zoomIn">+</button>
+            <a id="openNew" class="fallback-link" href="#" target="_blank" rel="noreferrer noopener">Abrir en nueva pestaña</a>
+            <a id="download" class="fallback-link" href="#" download>Descargar</a>
+          </div>
+        </div>
+
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="pdfCanvas"></canvas>
+          <!-- En caso de fallo con pdf.js aparecerá un iframe como fallback -->
+          <iframe id="pdfIframe" style="display:none;width:100%;height:100%;border:0;background:white;border-radius:8px"></iframe>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- PDF.js desde CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    // --- CONFIGURA AQUI TUS PDFs ---
+    // Pon rutas relativas tal como "pdfs/mi-documento.pdf" o URLs públicas.
+    const pdfList = [
+      // ejemplo: 'pdfs/ejemplo-1.pdf', 'pdfs/mi-resume.pdf'
+    ];
+    // --------------------------------
+
+    // Si no quieres usar pdf.js, puedes usar solamente <iframe src="ruta.pdf"></iframe>
+
+    const fileListEl = document.getElementById('fileList');
+    const searchEl = document.getElementById('search');
+    const canvas = document.getElementById('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    const iframe = document.getElementById('pdfIframe');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const pageInfo = document.getElementById('pageInfo');
+    const zoomOut = document.getElementById('zoomOut');
+    const zoomIn = document.getElementById('zoomIn');
+    const openNew = document.getElementById('openNew');
+    const download = document.getElementById('download');
+
+    let currentDoc = null; // object returned by pdf.js
+    let currentPage = 1;
+    let currentScale = 1.2;
+    let currentFile = null;
+
+    // pdf.js worker (ajusta si usas versión local)
+    if (window['pdfjsLib']) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
+
+    function renderList(filter = ''){
+      fileListEl.innerHTML = '';
+      const list = pdfList.filter(f => f.toLowerCase().includes(filter.toLowerCase()));
+      if(list.length === 0){
+        fileListEl.innerHTML = '<div style="color:var(--muted);padding:12px">No hay archivos. Añade rutas en la variable <code>pdfList</code>.</div>';
+        return;
+      }
+      list.forEach((f, i) => {
+        const d = document.createElement('div');
+        d.className = 'file';
+        d.tabIndex = 0;
+        d.innerHTML = `<strong>${f.split('/').pop()}</strong><div style="font-size:13px;color:var(--muted)">${f}</div>`;
+        d.addEventListener('click', () => loadFile(f, d));
+        d.addEventListener('keydown', (ev) => { if(ev.key === 'Enter') loadFile(f, d); });
+        fileListEl.appendChild(d);
+      });
+    }
+
+    searchEl.addEventListener('input', (e)=> renderList(e.target.value));
+
+    async function loadFile(path, element){
+      // marcar activo
+      Array.from(document.querySelectorAll('.file')).forEach(n=>n.classList.remove('active'));
+      if(element) element.classList.add('active');
+
+      currentFile = path;
+      openNew.href = path;
+      download.href = path;
+      download.setAttribute('download', path.split('/').pop());
+
+      // Intentamos render con pdf.js si está disponible
+      if(window['pdfjsLib']){
+        try{
+          iframe.style.display = 'none';
+          canvas.style.display = 'block';
+          currentDoc = await pdfjsLib.getDocument(path).promise;
+          currentPage = 1;
+          currentScale = 1.2;
+          renderPage();
+        }catch(err){
+          console.error('pdf.js error', err);
+          // fallback: mostrar en iframe
+          canvas.style.display = 'none';
+          iframe.style.display = 'block';
+          iframe.src = path;
+          pageInfo.textContent = '';
+        }
+      }else{
+        // si no hay pdf.js: mostrar via iframe
+        canvas.style.display = 'none';
+        iframe.style.display = 'block';
+        iframe.src = path;
+      }
+    }
+
+    async function renderPage(){
+      if(!currentDoc) return;
+      const page = await currentDoc.getPage(currentPage);
+      const viewport = page.getViewport({ scale: currentScale });
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(viewport.width * devicePixelRatio);
+      canvas.height = Math.floor(viewport.height * devicePixelRatio);
+      canvas.style.width = Math.floor(viewport.width) + 'px';
+      canvas.style.height = Math.floor(viewport.height) + 'px';
+      const renderContext = { canvasContext: ctx, viewport, transform: [devicePixelRatio, 0, 0, devicePixelRatio, 0, 0] };
+      await page.render(renderContext).promise;
+      pageInfo.textContent = `Página ${currentPage} / ${currentDoc.numPages}`;
+    }
+
+    prevBtn.addEventListener('click', ()=>{
+      if(!currentDoc) return;
+      if(currentPage > 1){ currentPage--; renderPage(); }
+    });
+    nextBtn.addEventListener('click', ()=>{
+      if(!currentDoc) return;
+      if(currentPage < currentDoc.numPages){ currentPage++; renderPage(); }
+    });
+    zoomIn.addEventListener('click', ()=>{ currentScale = Math.min(currentScale + 0.2, 4); renderPage(); });
+    zoomOut.addEventListener('click', ()=>{ currentScale = Math.max(currentScale - 0.2, 0.4); renderPage(); });
+
+    // inicializar lista
+    renderList();
+
+    // si quieres cargar el primer PDF automáticamente (si existe), descomenta lo siguiente:
+    // if(pdfList.length) loadFile(pdfList[0], document.querySelector('.file'));
+  </script>
+</body>
+</html>
