@@ -1,210 +1,233 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visor de PDFs — GitHub Pages</title>
-  <meta name="description" content="Visor sencillo de PDFs para colocar en un repositorio y usar con GitHub Pages" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repositorio - Estadística Espacial</title>
   <style>
-    :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#38bdf8}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    body{background:linear-gradient(180deg,#071024 0%,#071833 100%);color:#e6eef8}
-    .wrap{max-width:1100px;margin:28px auto;padding:20px}
-    header{display:flex;gap:16px;align-items:center}
-    h1{margin:0;font-size:20px}
-    .layout{display:grid;grid-template-columns:320px 1fr;gap:18px;margin-top:18px}
-    .panel{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,.6)}
-    .list{height:64vh;overflow:auto}
-    .file{padding:10px;border-radius:8px;margin-bottom:8px;cursor:pointer;background:transparent;border:1px solid transparent}
-    .file:hover{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.03)}
-    .file.active{outline:2px solid rgba(56,189,248,0.12);background:linear-gradient(90deg,rgba(56,189,248,0.03),transparent)}
-    .controls{display:flex;gap:8px;align-items:center;margin-bottom:10px}
-    button{background:transparent;color:var(--accent);border:1px solid rgba(56,189,248,0.18);padding:6px 8px;border-radius:8px;cursor:pointer}
-    button:active{transform:translateY(1px)}
-    .viewer{height:72vh;display:flex;flex-direction:column}
-    .toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px}
-    .canvas-wrap{flex:1;overflow:auto;background:#081022;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center}
-    canvas{box-shadow:0 8px 30px rgba(2,6,23,0.6);max-width:100%;height:auto}
-    .search{width:100%;padding:8px;margin-bottom:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
-    .note{font-size:13px;color:var(--muted);margin-top:10px}
-    .fallback-link{color:var(--accent);text-decoration:underline}
-    @media (max-width:880px){.layout{grid-template-columns:1fr} .list{height:24vh}.viewer{height:56vh}}
-  </style>
-  <!--
-    INSTRUCCIONES (LEE):
-    1) Coloca tus PDFs dentro de la carpeta `pdfs/` en tu repositorio (junto a este archivo) o usa rutas relativas.
-    2) Edita la variable `pdfList` más abajo para añadir/ordenar los nombres de los PDFs.
-    3) Sube al repo y activa GitHub Pages (branch main / docs/ o root según prefieras).
-    4) Abre la página publicada para ver y navegar los PDFs.
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
 
-    Nota: GitHub Pages sirve archivos estáticos. El visor usa pdf.js (CDN). Si prefieres no depender del CDN
-    puedes descargar pdf.js y referenciarlo localmente (sustituye las URLs de worker y librería).
-  -->
+    header {
+      background-color: #0d1117;
+      color: #ffffff;
+      text-align: center;
+      padding: 40px 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    header h1 {
+      font-size: 2.2em;
+      margin: 0;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 1em;
+      margin-top: 8px;
+      color: #b9bbbe;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 25px;
+      padding: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    iframe {
+      width: 100%;
+      height: 260px;
+      border: none;
+      background-color: #f0f0f0;
+    }
+
+    .content {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .content h3 {
+      margin: 0 0 10px;
+      font-size: 1.1em;
+      color: #111;
+    }
+
+    .content p {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 15px;
+      line-height: 1.5em;
+    }
+
+    .buttons a {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 16px;
+      font-size: 0.9em;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #007bff;
+      transition: background-color 0.3s ease;
+    }
+
+    .buttons a:hover {
+      background-color: #0056b3;
+    }
+
+    footer {
+      background-color: #0d1117;
+      color: #ccc;
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9em;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 24 24'><rect rx='5' width='24' height='24' fill='%2338bdf8'/><text x='50%' y='54%' font-size='12' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>PDF</text></svg>" alt="logo" style="border-radius:8px;"/>
-      <div>
-        <h1>Visor de PDFs (para GitHub Pages)</h1>
-        <div style="color:var(--muted);font-size:13px">Clic en un archivo a la izquierda para cargarlo aquí.</div>
+
+<header>
+  <h1>📊 Repositorio: Estadística Espacial</h1>
+  <p>Material técnico, académico y de investigación — Universidad Nacional del Altiplano</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <iframe src="pdfs/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf"></iframe>
+    <div class="content">
+      <h3>Aplicación de Autocorrelación Espacial</h3>
+      <p>Análisis de la autocorrelación espacial en estudios geográficos y estadísticos para la detección de patrones territoriales.</p>
+      <div class="buttons">
+        <a href="pdfs/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf" download>Descargar</a>
       </div>
-    </header>
-
-    <div class="layout">
-      <aside class="panel">
-        <div class="controls">
-          <input id="search" class="search" placeholder="Buscar archivos..." />
-        </div>
-        <div class="list" id="fileList" aria-live="polite"></div>
-        <div class="note">Coloca tus PDFs en <code>pdfs/</code> y añade sus nombres en la variable <code>pdfList</code> dentro del código.</div>
-      </aside>
-
-      <main class="panel viewer">
-        <div class="toolbar">
-          <div>
-            <button id="prev">◀ Página anterior</button>
-            <button id="next">Página siguiente</button>
-            <span id="pageInfo" style="margin-left:10px;color:var(--muted)"></span>
-          </div>
-          <div>
-            <button id="zoomOut">-</button>
-            <button id="zoomIn">+</button>
-            <a id="openNew" class="fallback-link" href="#" target="_blank" rel="noreferrer noopener">Abrir en nueva pestaña</a>
-            <a id="download" class="fallback-link" href="#" download>Descargar</a>
-          </div>
-        </div>
-
-        <div class="canvas-wrap" id="canvasWrap">
-          <canvas id="pdfCanvas"></canvas>
-          <!-- En caso de fallo con pdf.js aparecerá un iframe como fallback -->
-          <iframe id="pdfIframe" style="display:none;width:100%;height:100%;border:0;background:white;border-radius:8px"></iframe>
-        </div>
-
-      </main>
     </div>
   </div>
 
-  <!-- PDF.js desde CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script>
-    // --- CONFIGURA AQUI TUS PDFs ---
-    // Pon rutas relativas tal como "pdfs/mi-documento.pdf" o URLs públicas.
-    const pdfList = [
-      // ejemplo: 'pdfs/ejemplo-1.pdf', 'pdfs/mi-resume.pdf'
-    ];
-    // --------------------------------
+  <div class="card">
+    <iframe src="pdfs/Correo%20de%20Universidad%20Nacional%20del%20Altiplano%20-.pdf"></iframe>
+    <div class="content">
+      <h3>Correo de Universidad Nacional del Altiplano</h3>
+      <p>Documento informativo institucional de la Universidad Nacional del Altiplano sobre comunicación académica y gestión estudiantil.</p>
+      <div class="buttons">
+        <a href="pdfs/Correo%20de%20Universidad%20Nacional%20del%20Altiplano%20-.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/Correo%20de%20Universidad%20Nacional%20del%20Altiplano%20-.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-    // Si no quieres usar pdf.js, puedes usar solamente <iframe src="ruta.pdf"></iframe>
+  <div class="card">
+    <iframe src="pdfs/Gaussian%20Random%20Fields.pdf"></iframe>
+    <div class="content">
+      <h3>Gaussian Random Fields</h3>
+      <p>Estudio de los campos aleatorios gaussianos y su aplicación en modelamiento espacial y simulación estadística avanzada.</p>
+      <div class="buttons">
+        <a href="pdfs/Gaussian%20Random%20Fields.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/Gaussian%20Random%20Fields.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-    const fileListEl = document.getElementById('fileList');
-    const searchEl = document.getElementById('search');
-    const canvas = document.getElementById('pdfCanvas');
-    const ctx = canvas.getContext('2d');
-    const iframe = document.getElementById('pdfIframe');
-    const prevBtn = document.getElementById('prev');
-    const nextBtn = document.getElementById('next');
-    const pageInfo = document.getElementById('pageInfo');
-    const zoomOut = document.getElementById('zoomOut');
-    const zoomIn = document.getElementById('zoomIn');
-    const openNew = document.getElementById('openNew');
-    const download = document.getElementById('download');
+  <div class="card">
+    <iframe src="pdfs/Generation%20of%20High-Resolution%20Agricultural.pdf"></iframe>
+    <div class="content">
+      <h3>Generation of High-Resolution Agricultural Data</h3>
+      <p>Documento técnico sobre generación de datos agrícolas de alta resolución mediante métodos geoestadísticos y de interpolación.</p>
+      <div class="buttons">
+        <a href="pdfs/Generation%20of%20High-Resolution%20Agricultural.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/Generation%20of%20High-Resolution%20Agricultural.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-    let currentDoc = null; // object returned by pdf.js
-    let currentPage = 1;
-    let currentScale = 1.2;
-    let currentFile = null;
+  <div class="card">
+    <iframe src="pdfs/Muestreo%20Bootstrap.pdf"></iframe>
+    <div class="content">
+      <h3>Muestreo Bootstrap</h3>
+      <p>Guía detallada sobre el método de remuestreo bootstrap aplicado a la estimación de varianza en contextos espaciales.</p>
+      <div class="buttons">
+        <a href="pdfs/Muestreo%20Bootstrap.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/Muestreo%20Bootstrap.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-    // pdf.js worker (ajusta si usas versión local)
-    if (window['pdfjsLib']) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-    }
+  <div class="card">
+    <iframe src="pdfs/Posicionamiento%20de%20Información.pdf"></iframe>
+    <div class="content">
+      <h3>Posicionamiento de Información</h3>
+      <p>Estudio sobre el posicionamiento y visualización de información geoespacial para análisis territoriales de precisión.</p>
+      <div class="buttons">
+        <a href="pdfs/Posicionamiento%20de%20Información.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/Posicionamiento%20de%20Información.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-    function renderList(filter = ''){
-      fileListEl.innerHTML = '';
-      const list = pdfList.filter(f => f.toLowerCase().includes(filter.toLowerCase()));
-      if(list.length === 0){
-        fileListEl.innerHTML = '<div style="color:var(--muted);padding:12px">No hay archivos. Añade rutas en la variable <code>pdfList</code>.</div>';
-        return;
-      }
-      list.forEach((f, i) => {
-        const d = document.createElement('div');
-        d.className = 'file';
-        d.tabIndex = 0;
-        d.innerHTML = `<strong>${f.split('/').pop()}</strong><div style="font-size:13px;color:var(--muted)">${f}</div>`;
-        d.addEventListener('click', () => loadFile(f, d));
-        d.addEventListener('keydown', (ev) => { if(ev.key === 'Enter') loadFile(f, d); });
-        fileListEl.appendChild(d);
-      });
-    }
+  <div class="card">
+    <iframe src="pdfs/Research%20Statement.pdf"></iframe>
+    <div class="content">
+      <h3>Research Statement</h3>
+      <p>Documento de presentación académica con las líneas de investigación y desarrollo científico en el campo de la estadística espacial.</p>
+      <div class="buttons">
+        <a href="pdfs/Research%20Statement.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/Research%20Statement.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-    searchEl.addEventListener('input', (e)=> renderList(e.target.value));
+  <div class="card">
+    <iframe src="pdfs/matrices.pdf"></iframe>
+    <div class="content">
+      <h3>Matrices</h3>
+      <p>Documento técnico sobre el uso y manipulación de matrices en modelos de correlación espacial y análisis multivariado.</p>
+      <div class="buttons">
+        <a href="pdfs/matrices.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/matrices.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-    async function loadFile(path, element){
-      // marcar activo
-      Array.from(document.querySelectorAll('.file')).forEach(n=>n.classList.remove('active'));
-      if(element) element.classList.add('active');
+  <div class="card">
+    <iframe src="pdfs/bootstrap.R"></iframe>
+    <div class="content">
+      <h3>bootstrap.R</h3>
+      <p>Script en lenguaje R que implementa métodos de remuestreo bootstrap para el análisis de datos espaciales.</p>
+      <div class="buttons">
+        <a href="pdfs/bootstrap.R" target="_blank">Ver Código</a>
+        <a href="pdfs/bootstrap.R" download>Descargar</a>
+      </div>
+    </div>
+  </div>
 
-      currentFile = path;
-      openNew.href = path;
-      download.href = path;
-      download.setAttribute('download', path.split('/').pop());
+</div>
 
-      // Intentamos render con pdf.js si está disponible
-      if(window['pdfjsLib']){
-        try{
-          iframe.style.display = 'none';
-          canvas.style.display = 'block';
-          currentDoc = await pdfjsLib.getDocument(path).promise;
-          currentPage = 1;
-          currentScale = 1.2;
-          renderPage();
-        }catch(err){
-          console.error('pdf.js error', err);
-          // fallback: mostrar en iframe
-          canvas.style.display = 'none';
-          iframe.style.display = 'block';
-          iframe.src = path;
-          pageInfo.textContent = '';
-        }
-      }else{
-        // si no hay pdf.js: mostrar via iframe
-        canvas.style.display = 'none';
-        iframe.style.display = 'block';
-        iframe.src = path;
-      }
-    }
+<footer>
+  <p>© 2025 Repositorio Estadística Espacial — Universidad Nacional del Altiplano | Autor: CuchoJ</p>
+</footer>
 
-    async function renderPage(){
-      if(!currentDoc) return;
-      const page = await currentDoc.getPage(currentPage);
-      const viewport = page.getViewport({ scale: currentScale });
-      const devicePixelRatio = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(viewport.width * devicePixelRatio);
-      canvas.height = Math.floor(viewport.height * devicePixelRatio);
-      canvas.style.width = Math.floor(viewport.width) + 'px';
-      canvas.style.height = Math.floor(viewport.height) + 'px';
-      const renderContext = { canvasContext: ctx, viewport, transform: [devicePixelRatio, 0, 0, devicePixelRatio, 0, 0] };
-      await page.render(renderContext).promise;
-      pageInfo.textContent = `Página ${currentPage} / ${currentDoc.numPages}`;
-    }
-
-    prevBtn.addEventListener('click', ()=>{
-      if(!currentDoc) return;
-      if(currentPage > 1){ currentPage--; renderPage(); }
-    });
-    nextBtn.addEventListener('click', ()=>{
-      if(!currentDoc) return;
-      if(currentPage < currentDoc.numPages){ currentPage++; renderPage(); }
-    });
-    zoomIn.addEventListener('click', ()=>{ currentScale = Math.min(currentScale + 0.2, 4); renderPage(); });
-    zoomOut.addEventListener('click', ()=>{ currentScale = Math.max(currentScale - 0.2, 0.4); renderPage(); });
-
-    // inicializar lista
-    renderList();
-
-    // si quieres cargar el primer PDF automáticamente (si existe), descomenta lo siguiente:
-    // if(pdfList.length) loadFile(pdfList[0], document.querySelector('.file'));
-  </script>
 </body>
 </html>
