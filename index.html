@@ -5,33 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Repositorio | Estadística Espacial</title>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --primary: #4f46e5;
       --secondary: #06b6d4;
-      --dark: #0f172a;
-      --light: #f8fafc;
+      --dark: #020617;
       --glass: rgba(255, 255, 255, 0.15);
       --border-glass: rgba(255, 255, 255, 0.25);
     }
 
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(120deg, #0f172a, #020617);
-      color: var(--light);
-      min-height: 100vh;
+      background: linear-gradient(120deg, #020617, #0f172a);
+      color: #f8fafc;
     }
 
-    /* HEADER */
     header {
       padding: 70px 20px;
       text-align: center;
@@ -39,101 +35,90 @@
     }
 
     header h1 {
-      font-size: 2.6rem;
-      font-weight: 700;
+      font-size: 2.5rem;
       margin-bottom: 10px;
     }
 
     header p {
-      color: #cbd5f5;
+      color: #c7d2fe;
       max-width: 700px;
       margin: auto;
-      font-size: 1rem;
     }
 
-    /* CONTAINER */
+    /* SECTION TITLE */
+    .section-title {
+      max-width: 1400px;
+      margin: 60px auto 20px;
+      padding: 0 30px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #e0e7ff;
+    }
+
     .container {
       max-width: 1400px;
       margin: auto;
-      padding: 60px 30px;
+      padding: 30px;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 30px;
     }
 
-    /* CARD */
     .card {
       background: linear-gradient(135deg, var(--glass), rgba(255,255,255,0.05));
       border: 1px solid var(--border-glass);
       border-radius: 18px;
       backdrop-filter: blur(12px);
       overflow: hidden;
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      transition: all 0.35s ease;
       box-shadow: 0 10px 30px rgba(0,0,0,0.35);
     }
 
     .card:hover {
-      transform: translateY(-10px) scale(1.02);
+      transform: translateY(-10px);
       box-shadow: 0 25px 50px rgba(79,70,229,0.35);
     }
 
     iframe {
       width: 100%;
-      height: 240px;
+      height: 230px;
       border: none;
       background: #020617;
     }
 
     .content {
       padding: 22px;
+      text-align: center;
     }
 
     .content h3 {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       margin-bottom: 10px;
-      font-weight: 600;
       color: #e0e7ff;
     }
 
     .content p {
       font-size: 0.9rem;
-      line-height: 1.6;
       color: #c7d2fe;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+      line-height: 1.6;
     }
 
-    /* BUTTONS */
     .buttons {
       display: flex;
-      gap: 10px;
       justify-content: center;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .buttons a {
-      padding: 9px 18px;
+      padding: 8px 18px;
       border-radius: 999px;
       font-size: 0.85rem;
       text-decoration: none;
-      font-weight: 500;
-      border: 1px solid var(--secondary);
       color: var(--secondary);
+      border: 1px solid var(--secondary);
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .buttons a::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.4s;
-    }
-
-    .buttons a:hover::before {
-      transform: translateX(100%);
     }
 
     .buttons a:hover {
@@ -142,24 +127,13 @@
       box-shadow: 0 0 15px rgba(6,182,212,0.6);
     }
 
-    /* FOOTER */
     footer {
       text-align: center;
       padding: 25px;
       font-size: 0.85rem;
       color: #94a3b8;
       border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    footer span {
-      color: #38bdf8;
-      font-weight: 600;
-    }
-
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 2rem;
-      }
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -168,59 +142,90 @@
 
 <header>
   <h1>📊 Repositorio de Estadística Espacial</h1>
-  <p>
-    Material académico, técnico y de investigación en estadística espacial  
-    <br>Universidad Nacional del Altiplano
-  </p>
+  <p>Material académico y de investigación — Universidad Nacional del Altiplano</p>
 </header>
 
+<!-- PRIMERA UNIDAD -->
+<h2 class="section-title">📘 Primera Unidad</h2>
 <div class="container">
 
-  <!-- CARD -->
+  <!-- Repite este bloque para todos los archivos -->
   <div class="card">
-    <iframe src="pdfs/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf"></iframe>
+    <iframe src="pdfs/unidad1/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf"></iframe>
     <div class="content">
       <h3>Aplicación de Autocorrelación Espacial</h3>
-      <p>Análisis de patrones territoriales mediante índices de autocorrelación espacial.</p>
+      <p>Análisis de patrones espaciales y correlación territorial.</p>
       <div class="buttons">
-        <a href="pdfs/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf" target="_blank">Ver PDF</a>
-        <a href="pdfs/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf" download>Descargar</a>
+        <a href="pdfs/unidad1/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/unidad1/Aplicacion%20de%20Autocorrelacion%20Espacial.pdf" download>Descargar</a>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <iframe src="pdfs/Gaussian%20Random%20Fields.pdf"></iframe>
+    <iframe src="pdfs/unidad1/Gaussian%20Random%20Fields.pdf"></iframe>
     <div class="content">
       <h3>Gaussian Random Fields</h3>
-      <p>Modelos espaciales avanzados basados en campos aleatorios gaussianos.</p>
+      <p>Modelos espaciales avanzados y simulación estadística.</p>
       <div class="buttons">
-        <a href="pdfs/Gaussian%20Random%20Fields.pdf" target="_blank">Ver PDF</a>
-        <a href="pdfs/Gaussian%20Random%20Fields.pdf" download>Descargar</a>
+        <a href="pdfs/unidad1/Gaussian%20Random%20Fields.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/unidad1/Gaussian%20Random%20Fields.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- (los demás archivos de unidad 1 siguen el mismo patrón) -->
+
+</div>
+
+<!-- SEGUNDA UNIDAD -->
+<h2 class="section-title">📗 Segunda Unidad</h2>
+<div class="container">
+
+  <div class="card">
+    <iframe src="pdfs/unidad2/archivo1.pdf"></iframe>
+    <div class="content">
+      <h3>Archivo Unidad 2 - 1</h3>
+      <p>Contenido correspondiente a la segunda unidad.</p>
+      <div class="buttons">
+        <a href="pdfs/unidad2/archivo1.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/unidad2/archivo1.pdf" download>Descargar</a>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <iframe src="pdfs/Muestreo%20Bootstrap.pdf"></iframe>
+    <iframe src="pdfs/unidad2/archivo2.pdf"></iframe>
     <div class="content">
-      <h3>Muestreo Bootstrap</h3>
-      <p>Técnicas de remuestreo aplicadas a inferencia estadística espacial.</p>
+      <h3>Archivo Unidad 2 - 2</h3>
+      <p>Material académico complementario.</p>
       <div class="buttons">
-        <a href="pdfs/Muestreo%20Bootstrap.pdf" target="_blank">Ver PDF</a>
-        <a href="pdfs/Muestreo%20Bootstrap.pdf" download>Descargar</a>
+        <a href="pdfs/unidad2/archivo2.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/unidad2/archivo2.pdf" download>Descargar</a>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <iframe src="pdfs/bootstrap.R"></iframe>
+    <iframe src="pdfs/unidad2/archivo3.pdf"></iframe>
     <div class="content">
-      <h3>Script bootstrap.R</h3>
-      <p>Implementación en R de métodos bootstrap para análisis espacial.</p>
+      <h3>Archivo Unidad 2 - 3</h3>
+      <p>Documentación y análisis avanzado.</p>
       <div class="buttons">
-        <a href="pdfs/bootstrap.R" target="_blank">Ver Código</a>
-        <a href="pdfs/bootstrap.R" download>Descargar</a>
+        <a href="pdfs/unidad2/archivo3.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/unidad2/archivo3.pdf" download>Descargar</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <iframe src="pdfs/unidad2/archivo4.pdf"></iframe>
+    <div class="content">
+      <h3>Archivo Unidad 2 - 4</h3>
+      <p>Material de cierre de la segunda unidad.</p>
+      <div class="buttons">
+        <a href="pdfs/unidad2/archivo4.pdf" target="_blank">Ver PDF</a>
+        <a href="pdfs/unidad2/archivo4.pdf" download>Descargar</a>
       </div>
     </div>
   </div>
@@ -228,7 +233,7 @@
 </div>
 
 <footer>
-  © 2025 — Repositorio Estadística Espacial | Autor: <span>CuchoJ</span>
+  © 2025 — Repositorio Estadística Espacial | Autor: <strong>CuchoJ</strong>
 </footer>
 
 </body>
